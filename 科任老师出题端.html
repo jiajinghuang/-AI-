@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>趣味问答题目上传系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            font-weight: 600;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .form-group label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+
+        .form-control {
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .question-cards {
+            display: grid;
+            gap: 24px;
+        }
+
+        .question-card {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 24px;
+            transition: all 0.3s;
+        }
+
+        .question-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 24px rgba(102, 126, 234, 0.15);
+        }
+
+        .question-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .question-card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .question-card-body {
+            display: grid;
+            gap: 16px;
+        }
+
+        .options-container {
+            background: white;
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .options-container-title {
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .option-item {
+            display: grid;
+            grid-template-columns: 50px 1fr 40px;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .option-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .option-letter {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .correct-radio {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .correct-radio input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-add-option {
+            background: #e7f3ff;
+            color: #667eea;
+            border: 2px dashed #667eea;
+            width: 100%;
+        }
+
+        .btn-add-option:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-add-option:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .submit-section {
+            text-align: center;
+            padding: 30px;
+            background: #f8f9fa;
+            border-top: 2px solid #e9ecef;
+        }
+
+        .submit-section .btn {
+            min-width: 200px;
+            font-size: 16px;
+            padding: 14px 32px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 6px;
+            display: none;
+        }
+
+        .form-group.error .form-control {
+            border-color: #e74c3c;
+        }
+
+        .form-group.error .error-message {
+            display: block;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 24px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+
+        .existing-data-list {
+            background: #f8f9fa;
+            padding: 16px;
+            border-radius: 8px;
+            margin: 16px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .existing-data-item {
+            padding: 10px;
+            background: white;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 14px;
+            border-left: 3px solid #ffc107;
+        }
+
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .loading::after {
+            content: "";
+            width: 16px;
+            height: 16px;
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            padding: 16px 24px;
+            border-radius: 8px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            z-index: 1001;
+            display: none;
+            animation: toastSlideIn 0.3s ease;
+            max-width: 400px;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            border-left: 4px solid #28a745;
+        }
+
+        .toast.error {
+            border-left: 4px solid #dc3545;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #ffc107;
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .progress-indicator {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .progress-indicator span {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .image-inputs-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .image-inputs-container .form-control {
+            width: 100%;
+        }
+
+        .btn-add-image {
+            margin-top: 10px;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-add-image:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .btn-option-image {
+            background: #17a2b8;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 0 5px;
+            transition: all 0.3s;
+        }
+
+        .btn-option-image:hover {
+            background: #138496;
+            transform: scale(1.05);
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .multi-select-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+            padding: 4px 8px;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+
+        .multi-select-toggle input[type="checkbox"] {
+            cursor: pointer;
+            width: 16px;
+            height: 16px;
+        }
+
+        .correct-answer-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-remove-option {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            margin-left: 5px;
+        }
+
+        .btn-remove-option:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 趣味问答题目上传系统</h1>
+            <p>科任教师专属 | 快速创建每周趣味题目</p>
+        </div>
+
+        <div class="content">
+            <!-- 基本信息区 -->
+            <div class="section">
+                <h2 class="section-title">📋 基本信息</h2>
+                <div class="form-row">
+                    <div class="form-group" id="gradeGroup">
+                        <label class="required">选择年级</label>
+                        <select class="form-control" id="gradeSelect">
+                            <option value="">请选择年级</option>
+                            <option value="一年级">一年级</option>
+                            <option value="二年级">二年级</option>
+                            <option value="三年级">三年级</option>
+                            <option value="四年级">四年级</option>
+                            <option value="五年级">五年级</option>
+                            <option value="六年级">六年级</option>
+                        </select>
+                        <div class="error-message">请选择年级</div>
+                    </div>
+
+                    <div class="form-group" id="subjectGroup">
+                        <label class="required">选择学科</label>
+                        <select class="form-control" id="subjectSelect">
+                            <option value="">请先选择年级</option>
+                        </select>
+                        <div class="error-message">请选择学科</div>
+                    </div>
+
+                    <div class="form-group" id="weekGroup">
+                        <label class="required">选择周数</label>
+                        <select class="form-control" id="weekSelect">
+                            <option value="">请选择周数</option>
+                            <option value="第2周">第2周</option>
+                            <option value="第4周">第4周</option>
+                            <option value="第6周">第6周</option>
+                            <option value="第8周">第8周</option>
+                            <option value="第10周">第10周</option>
+                            <option value="第12周">第12周</option>
+                            <option value="第14周">第14周</option>
+                            <option value="第16周">第16周</option>
+                            <option value="第18周">第18周</option>
+                        </select>
+                        <div class="error-message">请选择周数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 题目编辑区 -->
+            <div class="section">
+                <div class="progress-indicator">
+                    已添加 <span id="questionCount">0</span> / 5 道题目
+                </div>
+                <h2 class="section-title">✏️ 题目编辑</h2>
+                <div class="question-cards" id="questionCardsContainer">
+                    <!-- 预先生成5道题目卡片 -->
+                    <div class="question-card" id="question-1">
+                        <div class="question-card-header">
+                            <span class="question-card-title">📝 题目 1</span>
+                        </div>
+                        <div class="question-card-body">
+                            <div class="form-group">
+                                <label class="required">题干内容</label>
+                                <textarea class="form-control" id="q1-question" placeholder="请输入题目内容..." rows="3"></textarea>
+                                <div class="error-message" id="q1-question-error">请输入题干内容</div>
+                            </div>
+                            <div class="options-container">
+                                <div class="options-container-title">
+                                    选项设置（至少2个，最多4个）
+                                    <div class="multi-select-toggle">
+                                        <input type="checkbox" id="q1-multiSelect" onchange="toggleMultiSelect(1)">
+                                        <label for="q1-multiSelect" style="font-weight: normal; margin: 0;">多选题</label>
+                                    </div>
+                                </div>
+                                <div id="q1-options">
+                                    <div class="option-item" id="q1-option-A">
+                                        <div class="option-letter">A</div>
+                                        <input type="text" class="form-control" id="q1-option-A-content" placeholder="选项A内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(1, 'A')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q1-correct" value="A" id="q1-correct-A" class="single-correct">
+                                            <input type="checkbox" name="q1-multi-correct" value="A" id="q1-multi-correct-A" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(1, 'A')" title="删除选项">✕</button>
+                                    </div>
+                                    <div class="option-item" id="q1-option-B">
+                                        <div class="option-letter">B</div>
+                                        <input type="text" class="form-control" id="q1-option-B-content" placeholder="选项B内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(1, 'B')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q1-correct" value="B" id="q1-correct-B" class="single-correct">
+                                            <input type="checkbox" name="q1-multi-correct" value="B" id="q1-multi-correct-B" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(1, 'B')" title="删除选项">✕</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add-option" onclick="addOption(1)" id="q1-addOptionBtn">+ 添加选项</button>
+                                <div class="error-message" id="q1-options-error">请至少添加2个选项</div>
+                                <div class="error-message" id="q1-correct-error">请选择正确答案</div>
+                            </div>
+                            <div class="form-group">
+                                <label>配图链接（可选）</label>
+                                <div class="image-inputs-container" id="q1-imageInputs">
+                                    <input type="url" class="form-control" id="q1-image" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <button class="btn btn-add-image" onclick="addQuestionImage(1)" id="q1-addImageBtn">+ 添加更多配图</button>
+                                <div class="error-message" id="q1-image-error">请输入有效的URL地址</div>
+                            </div>
+                            <div class="form-group hidden" id="q1-musicGroup">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" id="q1-needMusic" onchange="toggleMusicInput(1)">
+                                    <label for="q1-needMusic" style="font-weight: normal; margin: 0;">需要上传音频</label>
+                                </div>
+                                <div id="q1-musicInputContainer" style="display: none;">
+                                    <label class="required">音乐链接</label>
+                                    <input type="url" class="form-control" id="q1-music" placeholder="https://example.com/music.mp3">
+                                    <div class="error-message" id="q1-music-error">请输入有效的音乐URL地址</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>答案解析（可选）</label>
+                                <textarea class="form-control" id="q1-explanation" placeholder="请输入答案解析..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-card" id="question-2">
+                        <div class="question-card-header">
+                            <span class="question-card-title">📝 题目 2</span>
+                        </div>
+                        <div class="question-card-body">
+                            <div class="form-group">
+                                <label class="required">题干内容</label>
+                                <textarea class="form-control" id="q2-question" placeholder="请输入题目内容..." rows="3"></textarea>
+                                <div class="error-message" id="q2-question-error">请输入题干内容</div>
+                            </div>
+                            <div class="options-container">
+                                <div class="options-container-title">
+                                    选项设置（至少2个，最多4个）
+                                    <div class="multi-select-toggle">
+                                        <input type="checkbox" id="q2-multiSelect" onchange="toggleMultiSelect(2)">
+                                        <label for="q2-multiSelect" style="font-weight: normal; margin: 0;">多选题</label>
+                                    </div>
+                                </div>
+                                <div id="q2-options">
+                                    <div class="option-item" id="q2-option-A">
+                                        <div class="option-letter">A</div>
+                                        <input type="text" class="form-control" id="q2-option-A-content" placeholder="选项A内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(2, 'A')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q2-correct" value="A" id="q2-correct-A" class="single-correct">
+                                            <input type="checkbox" name="q2-multi-correct" value="A" id="q2-multi-correct-A" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(2, 'A')" title="删除选项">✕</button>
+                                    </div>
+                                    <div class="option-item" id="q2-option-B">
+                                        <div class="option-letter">B</div>
+                                        <input type="text" class="form-control" id="q2-option-B-content" placeholder="选项B内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(2, 'B')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q2-correct" value="B" id="q2-correct-B" class="single-correct">
+                                            <input type="checkbox" name="q2-multi-correct" value="B" id="q2-multi-correct-B" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(2, 'B')" title="删除选项">✕</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add-option" onclick="addOption(2)" id="q2-addOptionBtn">+ 添加选项</button>
+                                <div class="error-message" id="q2-options-error">请至少添加2个选项</div>
+                                <div class="error-message" id="q2-correct-error">请选择正确答案</div>
+                            </div>
+                            <div class="form-group">
+                                <label>配图链接（可选）</label>
+                                <div class="image-inputs-container" id="q2-imageInputs">
+                                    <input type="url" class="form-control" id="q2-image" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <button class="btn btn-add-image" onclick="addQuestionImage(2)" id="q2-addImageBtn">+ 添加更多配图</button>
+                                <div class="error-message" id="q2-image-error">请输入有效的URL地址</div>
+                            </div>
+                            <div class="form-group hidden" id="q2-musicGroup">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" id="q2-needMusic" onchange="toggleMusicInput(2)">
+                                    <label for="q2-needMusic" style="font-weight: normal; margin: 0;">需要上传音频</label>
+                                </div>
+                                <div id="q2-musicInputContainer" style="display: none;">
+                                    <label class="required">音乐链接</label>
+                                    <input type="url" class="form-control" id="q2-music" placeholder="https://example.com/music.mp3">
+                                    <div class="error-message" id="q2-music-error">请输入有效的音乐URL地址</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>答案解析（可选）</label>
+                                <textarea class="form-control" id="q2-explanation" placeholder="请输入答案解析..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-card" id="question-3">
+                        <div class="question-card-header">
+                            <span class="question-card-title">📝 题目 3</span>
+                        </div>
+                        <div class="question-card-body">
+                            <div class="form-group">
+                                <label class="required">题干内容</label>
+                                <textarea class="form-control" id="q3-question" placeholder="请输入题目内容..." rows="3"></textarea>
+                                <div class="error-message" id="q3-question-error">请输入题干内容</div>
+                            </div>
+                            <div class="options-container">
+                                <div class="options-container-title">
+                                    选项设置（至少2个，最多4个）
+                                    <div class="multi-select-toggle">
+                                        <input type="checkbox" id="q3-multiSelect" onchange="toggleMultiSelect(3)">
+                                        <label for="q3-multiSelect" style="font-weight: normal; margin: 0;">多选题</label>
+                                    </div>
+                                </div>
+                                <div id="q3-options">
+                                    <div class="option-item" id="q3-option-A">
+                                        <div class="option-letter">A</div>
+                                        <input type="text" class="form-control" id="q3-option-A-content" placeholder="选项A内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(3, 'A')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q3-correct" value="A" id="q3-correct-A" class="single-correct">
+                                            <input type="checkbox" name="q3-multi-correct" value="A" id="q3-multi-correct-A" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(3, 'A')" title="删除选项">✕</button>
+                                    </div>
+                                    <div class="option-item" id="q3-option-B">
+                                        <div class="option-letter">B</div>
+                                        <input type="text" class="form-control" id="q3-option-B-content" placeholder="选项B内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(3, 'B')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q3-correct" value="B" id="q3-correct-B" class="single-correct">
+                                            <input type="checkbox" name="q3-multi-correct" value="B" id="q3-multi-correct-B" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(3, 'B')" title="删除选项">✕</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add-option" onclick="addOption(3)" id="q3-addOptionBtn">+ 添加选项</button>
+                                <div class="error-message" id="q3-options-error">请至少添加2个选项</div>
+                                <div class="error-message" id="q3-correct-error">请选择正确答案</div>
+                            </div>
+                            <div class="form-group">
+                                <label>配图链接（可选）</label>
+                                <div class="image-inputs-container" id="q3-imageInputs">
+                                    <input type="url" class="form-control" id="q3-image" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <button class="btn btn-add-image" onclick="addQuestionImage(3)" id="q3-addImageBtn">+ 添加更多配图</button>
+                                <div class="error-message" id="q3-image-error">请输入有效的URL地址</div>
+                            </div>
+                            <div class="form-group hidden" id="q3-musicGroup">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" id="q3-needMusic" onchange="toggleMusicInput(3)">
+                                    <label for="q3-needMusic" style="font-weight: normal; margin: 0;">需要上传音频</label>
+                                </div>
+                                <div id="q3-musicInputContainer" style="display: none;">
+                                    <label class="required">音乐链接</label>
+                                    <input type="url" class="form-control" id="q3-music" placeholder="https://example.com/music.mp3">
+                                    <div class="error-message" id="q3-music-error">请输入有效的音乐URL地址</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>答案解析（可选）</label>
+                                <textarea class="form-control" id="q3-explanation" placeholder="请输入答案解析..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-card" id="question-4">
+                        <div class="question-card-header">
+                            <span class="question-card-title">📝 题目 4</span>
+                        </div>
+                        <div class="question-card-body">
+                            <div class="form-group">
+                                <label class="required">题干内容</label>
+                                <textarea class="form-control" id="q4-question" placeholder="请输入题目内容..." rows="3"></textarea>
+                                <div class="error-message" id="q4-question-error">请输入题干内容</div>
+                            </div>
+                            <div class="options-container">
+                                <div class="options-container-title">
+                                    选项设置（至少2个，最多4个）
+                                    <div class="multi-select-toggle">
+                                        <input type="checkbox" id="q4-multiSelect" onchange="toggleMultiSelect(4)">
+                                        <label for="q4-multiSelect" style="font-weight: normal; margin: 0;">多选题</label>
+                                    </div>
+                                </div>
+                                <div id="q4-options">
+                                    <div class="option-item" id="q4-option-A">
+                                        <div class="option-letter">A</div>
+                                        <input type="text" class="form-control" id="q4-option-A-content" placeholder="选项A内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(4, 'A')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q4-correct" value="A" id="q4-correct-A" class="single-correct">
+                                            <input type="checkbox" name="q4-multi-correct" value="A" id="q4-multi-correct-A" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(4, 'A')" title="删除选项">✕</button>
+                                    </div>
+                                    <div class="option-item" id="q4-option-B">
+                                        <div class="option-letter">B</div>
+                                        <input type="text" class="form-control" id="q4-option-B-content" placeholder="选项B内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(4, 'B')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q4-correct" value="B" id="q4-correct-B" class="single-correct">
+                                            <input type="checkbox" name="q4-multi-correct" value="B" id="q4-multi-correct-B" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(4, 'B')" title="删除选项">✕</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add-option" onclick="addOption(4)" id="q4-addOptionBtn">+ 添加选项</button>
+                                <div class="error-message" id="q4-options-error">请至少添加2个选项</div>
+                                <div class="error-message" id="q4-correct-error">请选择正确答案</div>
+                            </div>
+                            <div class="form-group">
+                                <label>配图链接（可选）</label>
+                                <div class="image-inputs-container" id="q4-imageInputs">
+                                    <input type="url" class="form-control" id="q4-image" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <button class="btn btn-add-image" onclick="addQuestionImage(4)" id="q4-addImageBtn">+ 添加更多配图</button>
+                                <div class="error-message" id="q4-image-error">请输入有效的URL地址</div>
+                            </div>
+                            <div class="form-group hidden" id="q4-musicGroup">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" id="q4-needMusic" onchange="toggleMusicInput(4)">
+                                    <label for="q4-needMusic" style="font-weight: normal; margin: 0;">需要上传音频</label>
+                                </div>
+                                <div id="q4-musicInputContainer" style="display: none;">
+                                    <label class="required">音乐链接</label>
+                                    <input type="url" class="form-control" id="q4-music" placeholder="https://example.com/music.mp3">
+                                    <div class="error-message" id="q4-music-error">请输入有效的音乐URL地址</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>答案解析（可选）</label>
+                                <textarea class="form-control" id="q4-explanation" placeholder="请输入答案解析..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="question-card" id="question-5">
+                        <div class="question-card-header">
+                            <span class="question-card-title">📝 题目 5</span>
+                        </div>
+                        <div class="question-card-body">
+                            <div class="form-group">
+                                <label class="required">题干内容</label>
+                                <textarea class="form-control" id="q5-question" placeholder="请输入题目内容..." rows="3"></textarea>
+                                <div class="error-message" id="q5-question-error">请输入题干内容</div>
+                            </div>
+                            <div class="options-container">
+                                <div class="options-container-title">
+                                    选项设置（至少2个，最多4个）
+                                    <div class="multi-select-toggle">
+                                        <input type="checkbox" id="q5-multiSelect" onchange="toggleMultiSelect(5)">
+                                        <label for="q5-multiSelect" style="font-weight: normal; margin: 0;">多选题</label>
+                                    </div>
+                                </div>
+                                <div id="q5-options">
+                                    <div class="option-item" id="q5-option-A">
+                                        <div class="option-letter">A</div>
+                                        <input type="text" class="form-control" id="q5-option-A-content" placeholder="选项A内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(5, 'A')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q5-correct" value="A" id="q5-correct-A" class="single-correct">
+                                            <input type="checkbox" name="q5-multi-correct" value="A" id="q5-multi-correct-A" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(5, 'A')" title="删除选项">✕</button>
+                                    </div>
+                                    <div class="option-item" id="q5-option-B">
+                                        <div class="option-letter">B</div>
+                                        <input type="text" class="form-control" id="q5-option-B-content" placeholder="选项B内容">
+                                        <button class="btn btn-option-image" onclick="addOptionImage(5, 'B')" title="添加选项图片">📷</button>
+                                        <div class="correct-answer-group">
+                                            <input type="radio" name="q5-correct" value="B" id="q5-correct-B" class="single-correct">
+                                            <input type="checkbox" name="q5-multi-correct" value="B" id="q5-multi-correct-B" class="multi-correct" style="display: none;">
+                                        </div>
+                                        <button class="btn btn-remove-option" onclick="removeOption(5, 'B')" title="删除选项">✕</button>
+                                    </div>
+                                </div>
+                                <button class="btn btn-add-option" onclick="addOption(5)" id="q5-addOptionBtn">+ 添加选项</button>
+                                <div class="error-message" id="q5-options-error">请至少添加2个选项</div>
+                                <div class="error-message" id="q5-correct-error">请选择正确答案</div>
+                            </div>
+                            <div class="form-group">
+                                <label>配图链接（可选）</label>
+                                <div class="image-inputs-container" id="q5-imageInputs">
+                                    <input type="url" class="form-control" id="q5-image" placeholder="https://example.com/image.jpg">
+                                </div>
+                                <button class="btn btn-add-image" onclick="addQuestionImage(5)" id="q5-addImageBtn">+ 添加更多配图</button>
+                                <div class="error-message" id="q5-image-error">请输入有效的URL地址</div>
+                            </div>
+                            <div class="form-group hidden" id="q5-musicGroup">
+                                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                    <input type="checkbox" id="q5-needMusic" onchange="toggleMusicInput(5)">
+                                    <label for="q5-needMusic" style="font-weight: normal; margin: 0;">需要上传音频</label>
+                                </div>
+                                <div id="q5-musicInputContainer" style="display: none;">
+                                    <label class="required">音乐链接</label>
+                                    <input type="url" class="form-control" id="q5-music" placeholder="https://example.com/music.mp3">
+                                    <div class="error-message" id="q5-music-error">请输入有效的音乐URL地址</div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>答案解析（可选）</label>
+                                <textarea class="form-control" id="q5-explanation" placeholder="请输入答案解析..." rows="2"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 提交按钮区 -->
+            <div class="submit-section">
+                <button class="btn btn-primary" id="submitBtn" onclick="handleSubmit()">
+                    🚀 提交题目
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 确认覆盖弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header">⚠️ 确认覆盖已有题目</div>
+            <div class="modal-body">
+                <p>检测到当前 <strong><span id="modalGrade"></span></strong> - <strong><span id="modalSubject"></span></strong> - <strong><span id="modalWeek"></span></strong> 已有题目数据！</p>
+                <p style="margin-top: 12px;">已有题目列表：</p>
+                <div class="existing-data-list" id="existingDataList"></div>
+                <p style="color: #e74c3c; margin-top: 12px;">是否要覆盖原有题目？此操作不可撤销！</p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-danger" onclick="confirmOverwrite()">确认覆盖</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示消息 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // QuickForm API 配置
+        const QUICKFORM_API_URL = ''; // 请在此处配置趣味问答题目数据库的API(去掉/all)
+        const API_ALL_URL = `${QUICKFORM_API_URL}/all`; // 查询所有数据的API地址
+
+        // 全局状态
+        const TOTAL_QUESTIONS = 5;
+        let existingData = null;
+
+        // 更新题目计数
+        function updateQuestionCount() {
+            document.getElementById('questionCount').textContent = TOTAL_QUESTIONS;
+        }
+
+        // 添加题目的配图
+        function addQuestionImage(questionIndex) {
+            const imageContainer = document.getElementById(`q${questionIndex}-imageInputs`);
+            const imageCount = imageContainer.querySelectorAll('input').length;
+
+            if (imageCount >= 5) {
+                showToast('最多只能添加5张配图', 'warning');
+                return;
+            }
+
+            const input = document.createElement('input');
+            input.type = 'url';
+            input.className = 'form-control';
+            input.placeholder = `配图链接 ${imageCount + 1}`;
+            input.id = `q${questionIndex}-image-${imageCount + 1}`;
+
+            imageContainer.appendChild(input);
+
+            if (imageCount + 1 >= 5) {
+                document.getElementById(`q${questionIndex}-addImageBtn`).disabled = true;
+            }
+        }
+
+        // 为选项添加图片
+        function addOptionImage(questionIndex, optionLetter) {
+            const optionId = `q${questionIndex}-option-${optionLetter}`;
+            const optionItem = document.getElementById(optionId);
+            
+            // 检查是否已经有图片输入框
+            let imageInput = document.getElementById(`q${questionIndex}-option-${optionLetter}-image`);
+            
+            if (imageInput) {
+                imageInput.focus();
+                return;
+            }
+
+            imageInput = document.createElement('input');
+            imageInput.type = 'url';
+            imageInput.className = 'form-control';
+            imageInput.placeholder = '选项图片链接';
+            imageInput.id = `q${questionIndex}-option-${optionLetter}-image`;
+            imageInput.style.marginTop = '8px';
+            imageInput.style.width = '100%';
+
+            optionItem.appendChild(imageInput);
+        }
+
+        // 切换音频输入显示
+        function toggleMusicInput(questionIndex) {
+            const checkbox = document.getElementById(`q${questionIndex}-needMusic`);
+            const musicContainer = document.getElementById(`q${questionIndex}-musicInputContainer`);
+
+            if (checkbox.checked) {
+                musicContainer.style.display = 'block';
+            } else {
+                musicContainer.style.display = 'none';
+            }
+        }
+
+        // 添加选项
+        function addOption(questionIndex) {
+            const optionsContainer = document.getElementById(`q${questionIndex}-options`);
+            const currentOptions = optionsContainer.querySelectorAll('.option-item').length;
+
+            if (currentOptions >= 4) {
+                showToast('最多只能添加4个选项', 'warning');
+                return;
+            }
+
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            const letter = optionLetters[currentOptions];
+
+            const optionItem = document.createElement('div');
+            optionItem.className = 'option-item';
+            optionItem.id = `q${questionIndex}-option-${letter}`;
+            optionItem.innerHTML = `
+                <div class="option-letter">${letter}</div>
+                <input type="text" class="form-control" id="q${questionIndex}-option-${letter}-content" placeholder="选项${letter}内容">
+                <button class="btn btn-option-image" onclick="addOptionImage(${questionIndex}, '${letter}')" title="添加选项图片">📷</button>
+                <div class="correct-answer-group">
+                    <input type="radio" name="q${questionIndex}-correct" value="${letter}" id="q${questionIndex}-correct-${letter}" class="single-correct">
+                    <input type="checkbox" name="q${questionIndex}-multi-correct" value="${letter}" id="q${questionIndex}-multi-correct-${letter}" class="multi-correct" style="display: none;">
+                </div>
+                <button class="btn btn-remove-option" onclick="removeOption(${questionIndex}, '${letter}')" title="删除选项">✕</button>
+            `;
+
+            optionsContainer.appendChild(optionItem);
+
+            // 如果已有4个选项，禁用添加按钮
+            if (currentOptions + 1 >= 4) {
+                document.getElementById(`q${questionIndex}-addOptionBtn`).disabled = true;
+            }
+
+            // 如果当前是多选题模式，确保新选项的复选框可见
+            const multiSelectCheckbox = document.getElementById(`q${questionIndex}-multiSelect`);
+            if (multiSelectCheckbox && multiSelectCheckbox.checked) {
+                const newMultiCorrect = document.getElementById(`q${questionIndex}-multi-correct-${letter}`);
+                const newSingleCorrect = document.getElementById(`q${questionIndex}-correct-${letter}`);
+                if (newMultiCorrect && newSingleCorrect) {
+                    newMultiCorrect.style.display = 'block';
+                    newSingleCorrect.style.display = 'none';
+                }
+            }
+        }
+
+        // 切换多选题模式
+        function toggleMultiSelect(questionIndex) {
+            const checkbox = document.getElementById(`q${questionIndex}-multiSelect`);
+            const optionsContainer = document.getElementById(`q${questionIndex}-options`);
+            
+            const singleCorrectInputs = optionsContainer.querySelectorAll('.single-correct');
+            const multiCorrectInputs = optionsContainer.querySelectorAll('.multi-correct');
+
+            if (checkbox.checked) {
+                // 切换到多选题模式：显示复选框，隐藏单选框
+                singleCorrectInputs.forEach(input => input.style.display = 'none');
+                multiCorrectInputs.forEach(input => input.style.display = 'block');
+            } else {
+                // 切换到单选题模式：显示单选框，隐藏复选框，并清空复选框
+                multiCorrectInputs.forEach(input => {
+                    input.style.display = 'none';
+                    input.checked = false;
+                });
+                singleCorrectInputs.forEach(input => input.style.display = 'block');
+            }
+        }
+
+        // 删除选项
+        function removeOption(questionIndex, letter) {
+            const optionItem = document.getElementById(`q${questionIndex}-option-${letter}`);
+            if (optionItem) {
+                optionItem.remove();
+                reorderOptions(questionIndex);
+                document.getElementById(`q${questionIndex}-addOptionBtn`).disabled = false;
+            }
+        }
+
+        // 重新排列选项字母
+        function reorderOptions(questionIndex) {
+            const optionsContainer = document.getElementById(`q${questionIndex}-options`);
+            const optionItems = optionsContainer.querySelectorAll('.option-item');
+            const optionLetters = ['A', 'B', 'C', 'D'];
+            const currentOptions = [];
+
+            // 检查当前是否是多选题模式
+            const isMultiSelect = document.getElementById(`q${questionIndex}-multiSelect`)?.checked;
+
+            optionItems.forEach((item, index) => {
+                const input = item.querySelector('input[type="text"]');
+                const radio = item.querySelector('input[type="radio"]');
+                const checkbox = item.querySelector('input[type="checkbox"]');
+                const imageInput = item.querySelector('input[type="url"]');
+                
+                currentOptions.push({
+                    content: input.value,
+                    isCorrect: radio.checked,
+                    isMultiCorrect: checkbox ? checkbox.checked : false,
+                    hasImage: !!imageInput,
+                    imageUrl: imageInput ? imageInput.value : ''
+                });
+            });
+
+            optionsContainer.innerHTML = '';
+            currentOptions.forEach((opt, index) => {
+                const letter = optionLetters[index];
+                const optionItem = document.createElement('div');
+                optionItem.className = 'option-item';
+                optionItem.innerHTML = `
+                    <div class="option-letter">${letter}</div>
+                    <input type="text" class="form-control" id="q${questionIndex}-option-${letter}-content" value="${opt.content}" placeholder="选项${letter}内容">
+                    <button class="btn btn-option-image" onclick="addOptionImage(${questionIndex}, '${letter}')" title="添加选项图片">📷</button>
+                    <div class="correct-answer-group">
+                        <input type="radio" name="q${questionIndex}-correct" value="${letter}" id="q${questionIndex}-correct-${letter}" class="single-correct" ${opt.isCorrect && !isMultiSelect ? 'checked' : ''} ${isMultiSelect ? 'style="display: none;"' : ''}>
+                        <input type="checkbox" name="q${questionIndex}-multi-correct" value="${letter}" id="q${questionIndex}-multi-correct-${letter}" class="multi-correct" ${opt.isMultiCorrect && isMultiSelect ? 'checked' : ''} ${isMultiSelect ? '' : 'style="display: none;"'}>
+                    </div>
+                    <button class="btn btn-remove-option" onclick="removeOption(${questionIndex}, '${letter}')" title="删除选项">✕</button>
+                `;
+                optionsContainer.appendChild(optionItem);
+
+                // 如果之前有图片输入，恢复它
+                if (opt.hasImage) {
+                    addOptionImage(questionIndex, letter);
+                    const imageInput = document.getElementById(`q${questionIndex}-option-${letter}-image`);
+                    if (imageInput) {
+                        imageInput.value = opt.imageUrl;
+                    }
+                }
+            });
+        }
+
+        // 监听年级选择变化，动态更新学科选项
+        document.getElementById('gradeSelect').addEventListener('change', function() {
+            const currentSubject = document.getElementById('subjectSelect').value;
+            updateSubjectsByGrade(currentSubject);
+        });
+
+        // 根据年级更新学科选项
+        function updateSubjectsByGrade(currentSubject = '') {
+            const grade = document.getElementById('gradeSelect').value;
+            const subjectSelect = document.getElementById('subjectSelect');
+
+            // 清空学科选项
+            subjectSelect.innerHTML = '<option value="">请选择学科</option>';
+
+            if (!grade) {
+                return;
+            }
+
+            // 定义不同年级的学科
+            const lowGradeSubjects = ['音乐', '体育', '美术', '心理', '科学'];
+            const highGradeSubjects = ['音乐', '体育', '美术', '信息', '心理', '科学', '英语'];
+
+            const subjects = (grade === '一年级' || grade === '二年级') ? lowGradeSubjects : highGradeSubjects;
+
+            // 添加学科选项
+            subjects.forEach(subject => {
+                const option = document.createElement('option');
+                option.value = subject;
+                option.textContent = subject;
+                subjectSelect.appendChild(option);
+            });
+
+            // 如果当前选择的学科在新列表中存在，则恢复选中状态
+            if (currentSubject && subjects.includes(currentSubject)) {
+                subjectSelect.value = currentSubject;
+            }
+        }
+
+        // 监听学科选择变化
+        document.getElementById('subjectSelect').addEventListener('change', function() {
+            const subject = this.value;
+            const isMusic = subject === '音乐';
+
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                const musicGroup = document.getElementById(`q${i}-musicGroup`);
+                const musicInput = document.getElementById(`q${i}-music`);
+
+                if (isMusic) {
+                    musicGroup.classList.remove('hidden');
+                    musicInput.setAttribute('required', 'true');
+                } else {
+                    musicGroup.classList.add('hidden');
+                    musicInput.removeAttribute('required');
+                    musicInput.value = '';
+                }
+            }
+        });
+
+        // 验证URL格式
+        function isValidURL(url) {
+            if (!url) return true;
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        // 验证基本信息
+        function validateBasicInfo() {
+            let isValid = true;
+            const grade = document.getElementById('gradeSelect').value;
+            const subject = document.getElementById('subjectSelect').value;
+            const week = document.getElementById('weekSelect').value;
+
+            if (!grade) {
+                document.getElementById('gradeGroup').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('gradeGroup').classList.remove('error');
+            }
+
+            if (!subject) {
+                document.getElementById('subjectGroup').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('subjectGroup').classList.remove('error');
+            }
+
+            if (!week) {
+                document.getElementById('weekGroup').classList.add('error');
+                isValid = false;
+            } else {
+                document.getElementById('weekGroup').classList.remove('error');
+            }
+
+            return isValid ? { grade, subject, week } : null;
+        }
+
+        // 验证题目数据
+        function validateQuestions(subject) {
+            const isMusic = subject === '音乐';
+            const validQuestions = [];
+
+            for (let i = 1; i <= TOTAL_QUESTIONS; i++) {
+                let isValid = true;
+                const questionData = { 题序: i };
+
+                const questionText = document.getElementById(`q${i}-question`).value.trim();
+                if (!questionText) {
+                    document.getElementById(`q${i}-question-error`).style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById(`q${i}-question-error`).style.display = 'none';
+                    questionData.题干 = questionText;
+                }
+
+                const optionsContainer = document.getElementById(`q${i}-options`);
+                const optionItems = optionsContainer.querySelectorAll('.option-item');
+                const options = {};
+                let hasCorrectAnswer = false;
+                let hasOptionError = false;
+
+                if (optionItems.length < 2) {
+                    document.getElementById(`q${i}-options-error`).style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById(`q${i}-options-error`).style.display = 'none';
+                }
+
+                optionItems.forEach(item => {
+                    const letterSpan = item.querySelector('.option-letter');
+                    const input = item.querySelector('input[type="text"]');
+                    const radio = item.querySelector('input[type="radio"]');
+                    const checkbox = item.querySelector('input[type="checkbox"]');
+                    const imageInput = item.querySelector('input[type="url"]');
+
+                    const letter = letterSpan.textContent;
+                    const content = input.value.trim();
+
+                    if (!content) {
+                        input.style.borderColor = '#e74c3c';
+                        hasOptionError = true;
+                    } else {
+                        input.style.borderColor = '#e0e0e0';
+                        options[letter] = content;
+                        
+                        // 检查选项是否有图片
+                        if (imageInput && imageInput.value.trim()) {
+                            const imageUrl = imageInput.value.trim();
+                            if (!isValidURL(imageUrl)) {
+                                imageInput.style.borderColor = '#e74c3c';
+                                hasOptionError = true;
+                            } else {
+                                imageInput.style.borderColor = '#e0e0e0';
+                                // 为选项添加图片链接
+                                if (!questionData.选项图片) {
+                                    questionData.选项图片 = {};
+                                }
+                                questionData.选项图片[letter] = imageUrl;
+                            }
+                        }
+
+                        // 检查正确答案（单选或多选）
+                        if (radio.checked || checkbox.checked) {
+                            hasCorrectAnswer = true;
+                            // 如果是多选题，答案用逗号分隔
+                            if (questionData.正确答案) {
+                                questionData.正确答案 += ',' + letter;
+                            } else {
+                                questionData.正确答案 = letter;
+                            }
+                        }
+                    }
+                });
+
+                // 判断题型（单选还是多选）
+                const isMultiSelect = document.getElementById(`q${i}-multiSelect`)?.checked;
+                questionData.题型 = isMultiSelect ? '多选题' : '单选题';
+
+
+                if (hasOptionError) {
+                    isValid = false;
+                }
+
+                if (!hasCorrectAnswer) {
+                    document.getElementById(`q${i}-correct-error`).style.display = 'block';
+                    isValid = false;
+                } else {
+                    document.getElementById(`q${i}-correct-error`).style.display = 'none';
+                }
+
+                questionData.选项 = options;
+
+                // 处理多张配图
+                const imageInputsContainer = document.getElementById(`q${i}-imageInputs`);
+                const imageInputs = imageInputsContainer.querySelectorAll('input');
+                const images = [];
+
+                imageInputs.forEach((imgInput, idx) => {
+                    const imageUrl = imgInput.value.trim();
+                    if (imageUrl) {
+                        if (!isValidURL(imageUrl)) {
+                            document.getElementById(`q${i}-image-error`).style.display = 'block';
+                            imgInput.style.borderColor = '#e74c3c';
+                            isValid = false;
+                        } else {
+                            imgInput.style.borderColor = '#e0e0e0';
+                            images.push(imageUrl);
+                        }
+                    }
+                });
+
+                if (images.length > 0) {
+                    document.getElementById(`q${i}-image-error`).style.display = 'none';
+                    if (images.length === 1) {
+                        questionData.配图链接 = images[0];
+                    } else {
+                        questionData.配图链接 = images;
+                    }
+                } else {
+                    document.getElementById(`q${i}-image-error`).style.display = 'none';
+                }
+
+                if (isMusic) {
+                    const needMusicCheckbox = document.getElementById(`q${i}-needMusic`);
+                    const musicInputContainer = document.getElementById(`q${i}-musicInputContainer`);
+                    
+                    // 只有当勾选了"需要上传音频"时，才验证音乐链接
+                    if (needMusicCheckbox && needMusicCheckbox.checked) {
+                        const musicInput = document.getElementById(`q${i}-music`);
+                        const musicUrl = musicInput.value.trim();
+                        if (!musicUrl) {
+                            document.getElementById(`q${i}-music-error`).style.display = 'block';
+                            isValid = false;
+                        } else if (!isValidURL(musicUrl)) {
+                            document.getElementById(`q${i}-music-error`).style.display = 'block';
+                            isValid = false;
+                        } else {
+                            document.getElementById(`q${i}-music-error`).style.display = 'none';
+                            questionData.音乐链接 = musicUrl;
+                        }
+                    }
+                }
+
+                const explanation = document.getElementById(`q${i}-explanation`).value.trim();
+                if (explanation) {
+                    questionData.解析 = explanation;
+                }
+
+                if (isValid) {
+                    validQuestions.push(questionData);
+                }
+            }
+
+            return validQuestions.length === TOTAL_QUESTIONS ? validQuestions : null;
+        }
+
+        // 检查已有数据（检查年级、学科和周数三者都匹配）
+        async function checkExistingData(grade, subject, week) {
+            try {
+                console.log('===== 开始检查已有数据 =====');
+                console.log('检查条件 - 年级:', grade, '学科:', subject, '周数:', week);
+
+                // 调用查询接口获取所有数据
+                const response = await fetch(`${QUICKFORM_API_URL}/all`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                console.log('查询API响应状态:', response.status);
+
+                if (!response.ok) {
+                    console.error('查询已有数据失败，HTTP状态:', response.status);
+                    return null;
+                }
+
+                const result = await response.json();
+                console.log('查询到的所有数据类型:', typeof result);
+                console.log('查询到的所有数据:', result);
+
+                // 处理API返回的数据，确保是数组格式
+                let dataList = [];
+                if (Array.isArray(result)) {
+                    dataList = result;
+                } else if (result && typeof result === 'object') {
+                    // QuickForm API返回格式：{submissions: [...], total_submissions: 7, ...}
+                    if (result.submissions && Array.isArray(result.submissions)) {
+                        dataList = result.submissions;
+                    } else if (result.data && Array.isArray(result.data)) {
+                        dataList = result.data;
+                    } else if (result.list && Array.isArray(result.list)) {
+                        dataList = result.list;
+                    } else if (result.items && Array.isArray(result.items)) {
+                        dataList = result.items;
+                    } else {
+                        console.error('无法解析的数据结构:', result);
+                        console.error('可用字段:', Object.keys(result));
+                        showToast('数据格式错误', 'error');
+                        return null;
+                    }
+                }
+
+                console.log('处理后的数据列表:', dataList);
+                console.log('数据列表长度:', dataList.length);
+
+                // 过滤出匹配年级、学科、周数的数据（三者都匹配）
+                const existingData = dataList.filter(item => {
+                    const isMatch = item.年级 === grade &&
+                                   item.学科 === subject &&
+                                   item.周数 === week;
+                    if (isMatch) {
+                        console.log('找到匹配项:', item);
+                    }
+                    return isMatch;
+                });
+
+                console.log('匹配的已有数据:', existingData);
+                console.log('匹配记录数量:', existingData.length);
+
+                if (existingData.length > 0) {
+                    console.log('===== 检查完成，发现重复数据 =====');
+                    return existingData;
+                }
+                console.log('===== 检查完成，未发现重复数据 =====');
+                return null;
+
+            } catch (error) {
+                console.error('检查已有数据失败:', error);
+                return null;
+            }
+        }
+
+        // 显示确认弹窗
+        function showConfirmModal(data) {
+            existingData = data;
+            document.getElementById('modalGrade').textContent = document.getElementById('gradeSelect').value;
+            document.getElementById('modalSubject').textContent = document.getElementById('subjectSelect').value;
+            document.getElementById('modalWeek').textContent = document.getElementById('weekSelect').value;
+
+            const listContainer = document.getElementById('existingDataList');
+            listContainer.innerHTML = '';
+
+            console.log('准备显示已有数据:', data);
+
+            data.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'existing-data-item';
+
+                // 检查题目数据是否存在
+                if (item.题目数据 && Array.isArray(item.题目数据)) {
+                    console.log(`记录 ${index + 1} 的题目数据:`, item.题目数据);
+                    const questionsHtml = item.题目数据.map((q, qIndex) => {
+                        return `<div style="margin-left: 20px;">
+                                    <strong>题目${qIndex + 1}:</strong> ${q.题干 || '（无题干）'}
+                                </div>`;
+                    }).join('');
+
+                    div.innerHTML = `
+                        <div style="margin-bottom: 10px;">
+                            <strong>📝 记录 ${index + 1}:</strong>
+                            <br><span style="margin-left: 20px;">提交时间: ${item.提交时间 || '未知'}</span>
+                            <br><span style="margin-left: 20px;">题目数量: ${item.题目数量 || 0}</span>
+                        </div>
+                        ${questionsHtml}
+                    `;
+                } else {
+                    div.innerHTML = `<strong>📝 记录 ${index + 1}:</strong> （无题目数据）`;
+                }
+
+                listContainer.appendChild(div);
+            });
+
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            existingData = null;
+        }
+
+        // 确认覆盖
+        async function confirmOverwrite() {
+            closeModal();
+            await submitData(true);
+        }
+
+        // 提交数据
+        async function submitData(overwrite = false) {
+            const basicInfo = validateBasicInfo();
+            if (!basicInfo) {
+                showToast('请完善基本信息', 'error');
+                return;
+            }
+
+            const validQuestions = validateQuestions(basicInfo.subject);
+            if (!validQuestions) {
+                showToast('请完善所有题目信息', 'error');
+                return;
+            }
+
+            const submitData = {
+                年级: basicInfo.grade,
+                学科: basicInfo.subject,
+                周数: basicInfo.week,
+                题目数量: TOTAL_QUESTIONS,
+                题目数据: validQuestions,
+                提交时间: new Date().toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                }).replace(/\//g, '-'),
+                覆盖: overwrite
+            };
+
+            console.log('准备提交的数据:', submitData);
+
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<span class="loading">提交中...</span>';
+            submitBtn.disabled = true;
+
+            try {
+                console.log('开始向API发送请求:', QUICKFORM_API_URL);
+
+                const response = await fetch(QUICKFORM_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(submitData)
+                });
+
+                console.log('API响应状态:', response.status, response.statusText);
+
+                // 尝试解析JSON响应
+                let result;
+                try {
+                    result = await response.json();
+                    console.log('API响应内容:', result);
+                } catch (jsonError) {
+                    console.error('解析JSON响应失败:', jsonError);
+                    // 如果无法解析JSON，尝试获取文本响应
+                    const textResponse = await response.text();
+                    console.log('API文本响应:', textResponse);
+                    showToast(`提交完成，响应状态: ${response.status}`, response.ok ? 'success' : 'error');
+                    return;
+                }
+
+                // 根据API响应处理结果
+                if (response.ok) {
+                    showToast('题目提交成功！🎉', 'success');
+                    // 可选：重置表单
+                    // resetForm();
+                } else {
+                    const errorMsg = result.message || result.error || `HTTP ${response.status}`;
+                    showToast(`提交失败：${errorMsg}`, 'error');
+                    console.error('提交失败详细信息:', result);
+                }
+
+            } catch (error) {
+                console.error('提交过程中发生错误:', error);
+                showToast(`提交失败：${error.message}`, 'error');
+            } finally {
+                submitBtn.innerHTML = '🚀 提交题目';
+                submitBtn.disabled = false;
+            }
+        }
+
+        // 处理提交按钮点击
+        async function handleSubmit() {
+            console.log('===== 开始提交流程 =====');
+            const basicInfo = validateBasicInfo();
+            if (!basicInfo) {
+                showToast('请完善基本信息', 'error');
+                return;
+            }
+            console.log('基本信息验证通过:', basicInfo);
+
+            const validQuestions = validateQuestions(basicInfo.subject);
+            if (!validQuestions) {
+                showToast('请完善所有题目信息', 'error');
+                return;
+            }
+            console.log('题目数据验证通过，题目数量:', validQuestions.length);
+
+            console.log('开始检查重复数据...');
+            console.log('检查条件 - 年级:', basicInfo.grade, '学科:', basicInfo.subject, '周数:', basicInfo.week);
+            console.log('API地址:', `${QUICKFORM_API_URL}/all`);
+
+            try {
+                const existing = await checkExistingData(basicInfo.grade, basicInfo.subject, basicInfo.week);
+                console.log('重复数据检查结果:', existing);
+
+                if (existing && existing.length > 0) {
+                    console.log('发现重复数据，显示确认弹窗');
+                    showConfirmModal(existing);
+                } else {
+                    console.log('没有发现重复数据，直接提交');
+                    await submitData(false);
+                }
+            } catch (error) {
+                console.error('检查重复数据时发生错误:', error);
+                console.error('错误类型:', error.name);
+                console.error('错误消息:', error.message);
+                
+                // 检查是否是跨域错误
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    console.error('可能的原因：跨域问题');
+                    showToast('数据检查失败，可能是网络或跨域问题，请重试', 'error');
+                } else {
+                    console.error('其他错误:', error);
+                    showToast('数据检查失败，请重试', 'error');
+                }
+            }
+        }
+
+        // 显示提示消息
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 页面加载完成后初始化
+        window.onload = function() {
+            updateQuestionCount();
+            console.log('题目上传系统初始化完成，所有题目卡片已预先生成');
+        };
+    </script>
+</body>
+</html>
